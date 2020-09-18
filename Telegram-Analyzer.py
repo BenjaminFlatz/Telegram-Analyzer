@@ -6,7 +6,7 @@ from pathlib import Path
 from os import path
 import matplotlib.pyplot as plt
 
-class CRS:
+class TAnalyzer
     def __init__(self):
          
         self.parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -86,8 +86,8 @@ class CRS:
             print(repr(e))       
 
     def run(self):
-        self.vis("CRS", self.args.filename, "name", "time", "bar", "count")
+        self.vis("Telegram-Analyzer", self.args.filename, "name", "time", "bar", "count")
 
 if __name__ == "__main__":
-    crs = CRS()
-    crs.run()
+    t_analyzer = TAnalyzer()
+    t_analyzer.run()
