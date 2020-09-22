@@ -3,7 +3,7 @@
 This is a simple Telegram chat export to csv converter.
 
 
-**parameters**
+**parameters:**
 
   *-f   --filename    help = filename for output file     default = "data"
   
