@@ -7,6 +7,6 @@ This is a simple Telegram chat export to csv converter.
 
   *-f   --filename    help = filename for output file     default = "data"
   
-  *-p   --path        help = path                         default = "ChatExport_27_07_2020" + os.path.sep
+  *-p   --path        help = path                         default = "ChatExport_DD_MM_YYYY" + os.path.sep
   
   *-n   --number      help = number of html files         default = 41
