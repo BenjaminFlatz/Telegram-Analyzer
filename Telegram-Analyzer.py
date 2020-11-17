@@ -11,7 +11,7 @@ class TAnalyzer
          
         self.parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         self.parser.add_argument("-f", "--filename", help="filename for output file", default="data", type=str)
-        self.parser.add_argument("-p", "--path", help="path", default="ChatExport_27_07_2020" + os.path.sep, type=str)
+        self.parser.add_argument("-p", "--path", help="path", default="ChatExport_DD_MM_YYYY" + os.path.sep, type=str)
         self.parser.add_argument("-n", "--number", help="number of html files", default=41, type=int)
         self.args = self.parser.parse_args() 
         
