@@ -1,12 +1,12 @@
-# Telegram-Analyzer
+<h1>Telegram-Analyzer</h1>
 
 This is a simple Telegram chat export to csv converter.
 
 
-**arguments:**
+<h3>arguments:</h3>
 
-  *-f   --filename    help = filename for output file     default = "data"
+  * -f   --filename    help = filename for output file     default = "data"
   
-  *-p   --path        help = path                         default = "ChatExport_DD_MM_YYYY" + os.path.sep
+  * -p   --path        help = path                         default = "ChatExport_DD_MM_YYYY" + os.path.sep
   
-  *-n   --number      help = number of html files         default = 41
+  * -n   --number      help = number of html files         default = 41
