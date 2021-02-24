@@ -6,15 +6,16 @@ from pathlib import Path
 from os import path
 import matplotlib.pyplot as plt
 
-class TAnalyzer
+class TAnalyzer:
     def __init__(self):
          
         self.parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-        self.parser.add_argument("-f", "--filename", help="filename for output file", default="data", type=str)
-        self.parser.add_argument("-p", "--path", help="path", default="ChatExport_DD_MM_YYYY" + os.path.sep, type=str)
-        self.parser.add_argument("-n", "--number", help="number of html files", default=41, type=int)
+        self.parser.add_argument("-f", "--filename", help="filename of output file", default="data.csv", type=str)
+        self.parser.add_argument("-p", "--path", help="path", default="ChatExport" + os.path.sep, type=str)
+        self.parser.add_argument("-n", "--number", help="number of html files", default=56, type=int)
         self.args = self.parser.parse_args() 
         
+       
         
     
     def read_file(self, file):
@@ -83,9 +84,12 @@ class TAnalyzer
         except KeyError as e:
             print(repr(e))
         except AttributeError as e:
-            print(repr(e))       
+            print(repr(e))
 
     def run(self):
+        
+        #self.read()
+
         self.vis("Telegram-Analyzer", self.args.filename, "name", "time", "bar", "count")
 
 if __name__ == "__main__":
