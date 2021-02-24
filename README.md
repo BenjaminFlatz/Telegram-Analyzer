@@ -1,6 +1,7 @@
 <h1>Telegram-Analyzer</h1>
 
 This is a simple Telegram chat export to csv converter.
+It's possible to visualize the data with Matplotlib.
 
 
 <h3>arguments:</h3>
