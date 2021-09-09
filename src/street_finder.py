@@ -43,6 +43,9 @@ class StreetFinder():
 
             df = pd.read_csv("Vorarlberg/csv/"+slugify(str(town["name"]))+".csv")
             df["stroffi"].to_csv("Vorarlberg/csv/streetnames/"+slugify(str(town["name"]))+".csv")
+
+    
+
 if __name__ == "__main__":
     sf = StreetFinder()
     sf.search_all_towns()

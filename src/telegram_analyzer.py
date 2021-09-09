@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 import csv
 
 class TelegramAnalyzer:
-    def __init__(self, filename):
-
-      self.filename = filename
+    def __init__(self):
+        self.path = path
  
     def export_2_csv(self, file, writer):
 
@@ -40,13 +39,13 @@ class TelegramAnalyzer:
 
         f.close()
 
-    def read(self):
-        with open(self.filename, 'w', newline = '') as csvfile:
+    def read(self, filename):
+        with open(filename, 'w', newline = '') as csvfile:
             writer = csv.writer(csvfile, delimiter = ',')
             writer.writerow(["name", "timestamp", "body"])
 
 
-            files = Path(self.args.path).glob('**' + os.path.sep + '*.html')
+            files = Path(self.path).glob('**' + os.path.sep + '*.html')
             for file in files:
                 print(str(file))
                 self.export_2_csv(str(file), writer)
@@ -85,7 +84,7 @@ class TelegramAnalyzer:
 
 
         
-        df = pd.read_csv("statistics.csv")
+        df = pd.read_csv("data/statistics.csv")
 
         df.plot(x="name", y="messages", kind="scatter")  # , subplots=True)
         # print(df)
@@ -95,12 +94,12 @@ class TelegramAnalyzer:
 
 
 
-    def categorize(self, categoriesFilename):
+    def get_statistics(self, categoriesFilename, chatFile):
 
 
         df = pd.DataFrame(columns=["category", "sum"])
         categories = pd.read_csv(categoriesFilename).applymap(str.lower)
-        data = pd.read_csv(self.filename).applymap(str.lower)
+        data = pd.read_csv(chatFile).applymap(str.lower)
 
 
         
@@ -112,7 +111,7 @@ class TelegramAnalyzer:
         categories['messages'] = messageSum
         print(categories)
 
-        categories.to_csv('statistics.csv')
+        categories.to_csv('data/statistics.csv')
 
         """
         for index, row in data.iterrows():
@@ -127,6 +126,17 @@ class TelegramAnalyzer:
                 
         """
 
-                
+    def set_primary_key(self, file):
+        df = pd.read_csv(file)
 
+        primaryKeys = []
+        for index, row in df.iterrows():
+            primaryKeys.append(index)
 
+        newDf = pd.DataFrame(columns=['primary_key'])
+        newDf.append(df)
+        print(newDf)
+
+if __name__ == "__main__":
+    ta = TelegramAnalyzer()
+    ta.set_primary_key("data/chat.csv")
