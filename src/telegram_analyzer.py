@@ -4,11 +4,15 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 from os import path
 import matplotlib.pyplot as plt
+import matplotlib
 import csv
+import numpy as np
+
 
 class TelegramAnalyzer:
-    def __init__(self):
+    def __init__(self, outDir):
         self.path = path
+        self.outDir = outDir
  
     def export_2_csv(self, file, writer):
 
@@ -126,8 +130,8 @@ class TelegramAnalyzer:
                 
         """
 
-    def set_primary_key(self, file):
-        df = pd.read_csv(file)
+    def set_primary_key(self, df):
+        
 
         primaryKeys = []
         for index, row in df.iterrows():
@@ -136,7 +140,54 @@ class TelegramAnalyzer:
         newDf = pd.DataFrame(columns=['primary_key'])
         newDf.append(df)
         print(newDf)
+        return newDf
+
+    def plot_hist(self, df):
+
+        df = self.get_categorized_df(df)
+        #cmap = plt.get_cmap('viridis')
+        #colors = cmap(np.linspace(0, 1, len(df)))
+       
+        #matplotlib.rc('font', family='Arial')
+        #df.plot.scatter(x="name", y="body")
+        plt.hist(x=df['name'].values, bins=len(df.index),alpha=0.5)
+        #plt.hist(x=df["body"].values)
+        #plt.xlabel("X", size=16)
+        #plt.ylabel("y", size=16)
+        plt.xticks(rotation=90)
+        plt.rc('axes', unicode_minus=False)
+        plt.title("Scatter Plot with Matplotlib", size=18)
+        plt.show()
+
+    def get_categorized_df(self, df):
+        groups = self.get_categories(df)
+        #dfCategories = df.assign(**{'body':df['body'].str.split(' ')})
+        df = df.assign(body=df['body'].str.replace(',', '').str.split(' ')).explode('body').reset_index()
+        #df = df.groupby(by=['body'])#.groups
+        df = df.set_index('body')
+        df = df.loc[['lustenau']]
+        print(df)
+        #df = df.drop_duplicates(subset=['body'])
+        df.to_csv(self.outDir + os.path.sep + 'categorized.csv', mode='w')
+
+        return df
+
+    def get_categories(self, df):
+        #dfCategories = df.assign(**{'body':df['body'].str.split(' ')})
+        df = df.assign(body=df['body'].str.replace(',', '').str.split(' ')).explode('body')
+        #df = df.groupby(by=["body"]).count()
+        df = df.set_index('body')#.drop_duplicates(subset=['body'])
+        #df.to_csv(self.outDir + os.path.sep + 'categories.csv', mode='w')
+        
+        categories = df.loc['lustenau']
+
+        print(categories)
+        return categories
+  
 
 if __name__ == "__main__":
-    ta = TelegramAnalyzer()
-    ta.set_primary_key("data/chat.csv")
+    ta = TelegramAnalyzer('data')
+    df = pd.read_csv("data/chat.csv")
+    #ta.set_primary_key(df)
+    #df = ta.get_categorized_df(df)
+    ta.plot_categorized(df)
