@@ -7,12 +7,14 @@ import matplotlib.pyplot as plt
 import matplotlib
 import csv
 import numpy as np
+import re
 
 
 class TelegramAnalyzer:
     def __init__(self, outDir):
         self.path = path
         self.outDir = outDir
+        self.df = pd.read_csv("data/chat.csv")
  
     def export_2_csv(self, file, writer):
 
@@ -86,36 +88,30 @@ class TelegramAnalyzer:
 
     def show_statistics(self):
 
-
-        
         df = pd.read_csv("data/statistics.csv")
-
         df.plot(x="name", y="messages", kind="scatter")  # , subplots=True)
-        # print(df)
+        #print(df)
 
         plt.title("statistics")
         plt.show()
 
 
 
-    def get_statistics(self, categoriesFilename, chatFile):
-
-
+    def get_statistics(self):
         df = pd.DataFrame(columns=["category", "sum"])
-        categories = pd.read_csv(categoriesFilename).applymap(str.lower)
-        data = pd.read_csv(chatFile).applymap(str.lower)
+        categories = self.get_categories(self.df)#pd.read_csv(categoriesFile).applymap(str.lower)
+        data = self.df
 
-
-        
         messageSum = []
+        categoriesList = []
         for index, category in categories.iterrows():
-            print(category['name']+" "+str(data['body'].str.contains(category['name']).sum()))
-            messageSum.append(data['body'].str.contains(category['name']).sum())
+            messageSum.append(data['body'].str.contains(category['body']).sum())
+            categoriesList.append(category['body'])
+            print(str(categoriesList) + str(messageSum))
             
-        categories['messages'] = messageSum
-        print(categories)
-
-        categories.to_csv('data/statistics.csv')
+        df = pd.DataFrame({"category":categoriesList,
+                            "sum":  messageSum})
+        df.to_csv('data/statistics.csv')
 
         """
         for index, row in data.iterrows():
@@ -142,52 +138,67 @@ class TelegramAnalyzer:
         print(newDf)
         return newDf
 
-    def plot_hist(self, df):
+    def get_towns(self):
+        df = pd.read_csv(self.outDir + os.path.sep + 'orte.csv').apply(lambda x: x.astype(str).str.lower())
+        towns = []
+        print(df.reset_index(drop=True))
+        df = df.reset_index(drop=True)
+        df.to_csv(self.outDir + os.path.sep + 'towns.csv')
+        for index, row in df.iterrows():
+            towns.append(str(row['name']).lower())
+        return towns
 
-        df = self.get_categorized_df(df)
+    def get_msg_categories(self):
+        df = pd.read_csv("data/chat.csv")
+        df = df.assign(body=df['body'].str.replace(',', '').str.split(' ')).explode('body').reset_index().apply(lambda x: x.astype(str).str.lower())
+        df = df.rename(columns={'index': 'msgKey'})
+        print(df)
+        df.to_csv(self.outDir + os.path.sep + 'categorized.csv', mode='w')
+
+        return df
+
+
+
+    def plot(self, df):
+        towns = self.get_towns()
+        print(towns)
+        return
+        df = self.get_df_by_towns(df, towns)
         #cmap = plt.get_cmap('viridis')
         #colors = cmap(np.linspace(0, 1, len(df)))
        
         #matplotlib.rc('font', family='Arial')
-        #df.plot.scatter(x="name", y="body")
-        plt.hist(x=df['name'].values, bins=len(df.index),alpha=0.5)
+        df.plot.scatter(x="body", y="name")
+        #plt.hist(x=df['body'], bins=len(df.index),alpha=0.5)
         #plt.hist(x=df["body"].values)
         #plt.xlabel("X", size=16)
         #plt.ylabel("y", size=16)
         plt.xticks(rotation=90)
         plt.rc('axes', unicode_minus=False)
-        plt.title("Scatter Plot with Matplotlib", size=18)
+        plt.title("Cops Radar Stau", size=18)
+        plt.grid(color='grey', linestyle='-.', linewidth=0.2)
         plt.show()
 
-    def get_categorized_df(self, df):
-        groups = self.get_categories(df)
-        #dfCategories = df.assign(**{'body':df['body'].str.split(' ')})
-        df = df.assign(body=df['body'].str.replace(',', '').str.split(' ')).explode('body').reset_index()
-        #df = df.groupby(by=['body'])#.groups
-        df = df.set_index('body')
-        df = df.loc[['lustenau']]
+    def get_df_by_towns(self, df, towns):
+        df = df.assign(body=df['body'].str.replace(',', '').str.split(' ')).explode('body').reset_index().apply(lambda x: x.astype(str).str.lower())
+        df = df.loc[df['body'].isin(towns)]
         print(df)
-        #df = df.drop_duplicates(subset=['body'])
         df.to_csv(self.outDir + os.path.sep + 'categorized.csv', mode='w')
 
         return df
 
     def get_categories(self, df):
-        #dfCategories = df.assign(**{'body':df['body'].str.split(' ')})
         df = df.assign(body=df['body'].str.replace(',', '').str.split(' ')).explode('body')
-        #df = df.groupby(by=["body"]).count()
-        df = df.set_index('body')#.drop_duplicates(subset=['body'])
-        #df.to_csv(self.outDir + os.path.sep + 'categories.csv', mode='w')
-        
-        categories = df.loc['lustenau']
-
-        print(categories)
-        return categories
-  
+        df["body"] = df["body"].str.replace('[^a-zA-Z]', '')
+        df = pd.DataFrame(df["body"]).applymap(str.lower)
+        df = df.drop_duplicates(subset=['body'])
+        print(df)
+        return df
+    
+    
+    def run(self):
+        print(self.get_statistics())
 
 if __name__ == "__main__":
     ta = TelegramAnalyzer('data')
-    df = pd.read_csv("data/chat.csv")
-    #ta.set_primary_key(df)
-    #df = ta.get_categorized_df(df)
-    ta.plot_categorized(df)
+    ta.run()
