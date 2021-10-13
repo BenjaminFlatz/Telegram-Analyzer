@@ -1,3 +1,4 @@
+from numpy.lib.function_base import angle
 import pandas as pd
 import os
 from bs4 import BeautifulSoup
@@ -7,8 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import csv
 import numpy as np
-import re
-
+import matplotlib.pyplot as plt
 
 class TelegramAnalyzer:
     def __init__(self, outDir):
@@ -88,12 +88,14 @@ class TelegramAnalyzer:
 
     def show_statistics(self):
 
-        df = pd.read_csv("data/statistics.csv")
-        df.plot(x="name", y="messages", kind="scatter")  # , subplots=True)
-        #print(df)
+        df = pd.read_csv("data/categorized.csv")
+        print(df)
 
-        plt.title("statistics")
+        plt.hist(df["body"], bins=len(df["body"].drop_duplicates().index))
+        plt.xticks(rotation='vertical')
+
         plt.show()
+
 
 
 
@@ -105,10 +107,10 @@ class TelegramAnalyzer:
         messageSum = []
         categoriesList = []
         for index, category in categories.iterrows():
-            messageSum.append(data['body'].str.contains(category['body']).sum())
+            messageSum.append(int(data['body'].str.contains(category['body']).sum()))
             categoriesList.append(category['body'])
-            print(str(categoriesList) + str(messageSum))
-            
+            #print(str(categoriesList) + str(messageSum))
+            print(index)
         df = pd.DataFrame({"category":categoriesList,
                             "sum":  messageSum})
         df.to_csv('data/statistics.csv')
@@ -191,13 +193,14 @@ class TelegramAnalyzer:
         df = df.assign(body=df['body'].str.replace(',', '').str.split(' ')).explode('body')
         df["body"] = df["body"].str.replace('[^a-zA-Z]', '')
         df = pd.DataFrame(df["body"]).applymap(str.lower)
-        df = df.drop_duplicates(subset=['body'])
+        df = df.drop_duplicates(subset=['body']).reset_index(drop=True)
         print(df)
         return df
     
     
     def run(self):
-        print(self.get_statistics())
+        #print(self.get_statistics())
+        self.show_statistics()
 
 if __name__ == "__main__":
     ta = TelegramAnalyzer('data')
